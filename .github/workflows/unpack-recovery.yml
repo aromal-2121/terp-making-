@@ -18,7 +18,7 @@ jobs:
 
       - name: Download unpacking script
         run: |
-          curl -L -o unpack_bootimg.py https://raw.githubusercontent.com/ROM-builders/tools/main/bootimg/unpack_bootimg.py
+          curl -L -o unpack_bootimg.py https://raw.githubusercontent.com/red-dragon-labs/Android-Scripts/main/bootimg/unpack_bootimg.pypy
           chmod +x unpack_bootimg.py
 
       - name: Run unpacking
