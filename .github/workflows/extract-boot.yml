@@ -1,0 +1,28 @@
+name: Extract Stock Boot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  extract-boot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y abootimg cpio gzip
+
+    - name: Extract stock boot.img
+      run: |
+        mkdir -p boot-output
+        cd boot-output
+        abootimg -x ../stock/boot.img
+        cd ..
+
+    - name: Upload extracted boot parts
+      uses: actions/upload-artifact@v4
+      with:
+        name: stock-boot-parts
+        path: boot-output/
