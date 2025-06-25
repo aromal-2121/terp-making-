@@ -45,10 +45,11 @@ with open(args.ramdisk, 'rb') as f:
 
 os_version = parse_os_version(args.os_version)
 os_patch_level = parse_os_patch(args.os_patch_level)
-header = struct.pack('8s11I16s512s', b'ANDROID!',
+header = struct.pack('8s12I16s512s', b'ANDROID!',
     len(kernel_data), len(ramdisk_data), 0, args.pagesize,
     args.base + args.kernel_offset, args.base + args.ramdisk_offset,
-    args.base + args.tags_offset, os_version, os_patch_level, 0,
+    0,  # second_addr (you don't use it)
+    args.base + args.tags_offset, os_version, os_patch_level, 0, 0,  # extra unused field
     args.board.encode('utf-8'),
     args.cmdline.encode('utf-8'))
 
