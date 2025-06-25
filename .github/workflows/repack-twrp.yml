@@ -11,19 +11,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y python3 python3-pip cpio
+    - name: Install Python
+      run: sudo apt-get update && sudo apt-get install -y python3
 
-    - name: Download working mkbootimg tool
+    - name: Download working mkbootimg.py
       run: |
         mkdir tools
-        curl -L -o tools/mkbootimg.py https://raw.githubusercontent.com/osm0sis/mkbootimg/master/mkbootimg.py
+        curl -L -o tools/mkbootimg.py https://raw.githubusercontent.com/erfanoabdi/bootimg_tools/master/mkbootimg.py
         chmod +x tools/mkbootimg.py
 
     - name: Repack TWRP image
       run: |
         mkdir -p output
-        tools/mkbootimg.py \
+        python3 tools/mkbootimg.py \
           --kernel repack/zImage \
           --ramdisk repack/twrp-ramdisk.img \
           --cmdline "$(grep 'cmdline' repack/bootimg.cfg | cut -d= -f2-)" \
