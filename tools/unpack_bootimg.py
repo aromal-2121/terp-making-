@@ -1,40 +1,44 @@
 #!/usr/bin/env python3
 import os, sys, struct, argparse
 
-def hex_or_int(x):
-    return int(x, 0)
+def read_bytes(f, n):
+    d = f.read(n)
+    if len(d) != n:
+        raise ValueError("Unexpected EOF")
+    return d
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--input', required=True, help='Input boot image')
+parser.add_argument('-i', '--input', required=True, help='Input boot/recovery image')
 parser.add_argument('-o', '--output', required=True, help='Output directory')
 args = parser.parse_args()
 
 with open(args.input, 'rb') as f:
-    data = f.read()
+    magic = read_bytes(f, 8)
+    if magic != b'ANDROID!':
+        raise ValueError("Not an Android boot image")
 
-# Unpack Android boot image header (version 0)
-hdr_format = '8s10I16s512s'
-hdr_size = struct.calcsize(hdr_format)
-hdr = struct.unpack(hdr_format, data[:hdr_size])
+    kernel_size = struct.unpack('<I', read_bytes(f, 4))[0]
+    kernel_addr = struct.unpack('<I', read_bytes(f, 4))[0]
+    ramdisk_size = struct.unpack('<I', read_bytes(f, 4))[0]
+    ramdisk_addr = struct.unpack('<I', read_bytes(f, 4))[0]
+    second_size = struct.unpack('<I', read_bytes(f, 4))[0]
+    second_addr = struct.unpack('<I', read_bytes(f, 4))[0]
+    tags_addr = struct.unpack('<I', read_bytes(f, 4))[0]
+    page_size = struct.unpack('<I', read_bytes(f, 4))[0]
+    dt_size = struct.unpack('<I', read_bytes(f, 4))[0]
+    unused = struct.unpack('<I', read_bytes(f, 4))[0]
+    name = read_bytes(f, 16).rstrip(b'\x00').decode()
+    cmdline = read_bytes(f, 512).rstrip(b'\x00').decode()
 
-magic, kernel_size, kernel_addr, ramdisk_size, ramdisk_addr, \
-second_size, second_addr, tags_addr, page_size, _, name, cmdline = hdr
+output_dir = args.output
+os.makedirs(output_dir, exist_ok=True)
 
-if magic != b'ANDROID!':
-    raise ValueError("Not a valid Android boot image")
+with open(f"{output_dir}/base.txt", 'w') as f:
+    base = kernel_addr & 0xfffff000
+    f.write(hex(base))
 
-os.makedirs(args.output, exist_ok=True)
+with open(f"{output_dir}/pagesize.txt", 'w') as f:
+    f.write(str(page_size))
 
-def write_file(name, value):
-    with open(os.path.join(args.output, name), 'w') as f:
-        f.write(str(value))
-
-write_file('kernel_size.txt', kernel_size)
-write_file('ramdisk_size.txt', ramdisk_size)
-write_file('base.txt', hex(kernel_addr & 0xfffff000))
-write_file('kernel_offset.txt', hex(kernel_addr - (kernel_addr & 0xfffff000)))
-write_file('ramdisk_offset.txt', hex(ramdisk_addr - (kernel_addr & 0xfffff000)))
-write_file('second_offset.txt', hex(second_addr - (kernel_addr & 0xfffff000)))
-write_file('tags_offset.txt', hex(tags_addr - (kernel_addr & 0xfffff000)))
-write_file('pagesize.txt', page_size)
-write_file('cmdline.txt', cmdline.decode('ascii').strip('\x00'))
+with open(f"{output_dir}/cmdline.txt", 'w') as f:
+    f.write(cmdline)
