@@ -17,7 +17,9 @@ jobs:
     - name: Extract TWRP image
       run: |
         mkdir -p output
-        abootimg -x input/twrp-3.5.2_9-0-evert.img -o output/
+        cd output
+        abootimg -x ../input/twrp-3.5.2_9-0-evert.img
+        cd ..
 
     - name: Unpack ramdisk
       run: |
