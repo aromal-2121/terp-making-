@@ -1,24 +1,27 @@
-name: Unpack Recovery Image
+name: Extract recovery.img
 
 on:
   workflow_dispatch:
 
 jobs:
-  unpack:
+  extract:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Create output dir
+      - name: Make output dir
         run: mkdir -p output
 
-      - name: Run unpacking using local script
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y python3
+
+      - name: Use local unpack_bootimg.py
         run: |
-          python3 tools/extract-bootimg.yml -i stock/recovery.img -o output
+          python3 tools/unpack_bootimg.py -i stock/recovery.img -o output
           ls output
 
-      - name: Upload output
+      - name: Upload extracted files
         uses: actions/upload-artifact@v4
         with:
           name: unpacked-recovery
