@@ -1,0 +1,34 @@
+name: Extract TWRP Ramdisk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y abootimg cpio gzip
+
+    - name: Extract TWRP image
+      run: |
+        mkdir -p output
+        abootimg -x input/twrp-3.5.2_9-0-evert.img -o output/
+
+    - name: Unpack ramdisk
+      run: |
+        mkdir ramdisk
+        cd ramdisk
+        gzip -dc ../output/initrd.img | cpio -i
+        cd ..
+        find ramdisk | cpio -o -H newc | gzip > output/twrp-ramdisk.img
+
+    - name: Upload twrp-ramdisk.img
+      uses: actions/upload-artifact@v3
+      with:
+        name: twrp-ramdisk
+        path: output/twrp-ramdisk.img
