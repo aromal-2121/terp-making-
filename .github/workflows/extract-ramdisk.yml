@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y abootimg cpio gzip
@@ -28,7 +28,7 @@ jobs:
         find ramdisk | cpio -o -H newc | gzip > output/twrp-ramdisk.img
 
     - name: Upload twrp-ramdisk.img
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: twrp-ramdisk
         path: output/twrp-ramdisk.img
