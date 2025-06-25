@@ -13,17 +13,9 @@ jobs:
       - name: Create output dir
         run: mkdir -p output
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y python3
-
-      - name: Download unpacking script
+      - name: Run unpacking using local script
         run: |
-          curl -L -o unpack_bootimg.py https://raw.githubusercontent.com/phhusson/bootimg-tools/master/unpack_bootimg.py
-          chmod +x unpack_bootimg.py
-
-      - name: Run unpacking
-        run: |
-          python3 unpack_bootimg.py -i stock/recovery.img -o output
+          python3 tools/unpack_bootimg.py -i stock/recovery.img -o output
           ls output
 
       - name: Upload output
