@@ -20,7 +20,7 @@ jobs:
         run: |
           cd repack
           python3 ../tools/mkbootimg.py \
-            --kernel ../stock/zImage \
+            --kernel zImage \
             --ramdisk twrp_ramdisk.cpio.gz \
             --base 0x80000000 \
             --pagesize 2048 \
