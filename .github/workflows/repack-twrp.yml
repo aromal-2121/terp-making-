@@ -11,13 +11,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install Python
+    - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y python3
 
-    - name: Download working mkbootimg.py
+    - name: Download working mkbootimg
       run: |
         mkdir tools
-        curl -L -o tools/mkbootimg.py https://raw.githubusercontent.com/erfanoabdi/bootimg_tools/master/mkbootimg.py
+        curl -L -o tools/mkbootimg.py https://raw.githubusercontent.com/anestisb/android-bootimg-tools/master/mkbootimg.py
         chmod +x tools/mkbootimg.py
 
     - name: Repack TWRP image
@@ -37,7 +37,7 @@ jobs:
           --os_patch_level "$(grep 'os_patch_level' repack/bootimg.cfg | cut -d= -f2)" \
           -o output/new-twrp.img
 
-    - name: Upload repacked TWRP image
+    - name: Upload new-twrp.img
       uses: actions/upload-artifact@v4
       with:
         name: new-twrp
