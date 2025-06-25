@@ -1,0 +1,33 @@
+name: Unpack Recovery Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Create output dir
+        run: mkdir -p output
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y python3
+
+      - name: Download unpacking script
+        run: |
+          curl -L -o unpack_bootimg.py https://raw.githubusercontent.com/ROM-builders/tools/main/bootimg/unpack_bootimg.py
+          chmod +x unpack_bootimg.py
+
+      - name: Run unpacking
+        run: |
+          python3 unpack_bootimg.py -i stock/recovery.img -o output
+          ls output
+
+      - name: Upload output
+        uses: actions/upload-artifact@v4
+        with:
+          name: unpacked-recovery
+          path: output/
