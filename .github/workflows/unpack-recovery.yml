@@ -1,28 +1,30 @@
-name: Extract recovery.img
+name: Extract TWRP Ramdisk
 
 on:
   workflow_dispatch:
 
 jobs:
-  extract:
+  unpack:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Make output dir
-        run: mkdir -p output
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y python3 cpio gzip
 
-      - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y python3
+      - name: Create output directory
+        run: mkdir -p extracted_twrp
 
-      - name: Use local unpack_bootimg.py
+      - name: Unpack TWRP boot image
         run: |
-          python3 tools/unpack_bootimg.py -i stock/recovery.img -o output
-          ls output
+          python3 tools/unpack_bootimg.py \
+            -i input/twrp-3.5.2_9-0-ali.img \
+            -o extracted_twrp
 
-      - name: Upload extracted files
-        uses: actions/upload-artifact@v4
-        with:
-          name: unpacked-recovery
-          path: output/
+      - name: Debug: List everything in extracted_twrp
+        run: |
+          echo "=== File list ==="
+          ls -lh extracted_twrp
+          echo "=== File types ==="
+          file extracted_twrp/* || true
