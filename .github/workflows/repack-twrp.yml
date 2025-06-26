@@ -31,7 +31,7 @@ jobs:
             --cmdline "console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 androidboot.bootdevice=7824900.sdhci earlycon=msm_hsl_uart,0x78af000 buildvariant=user" \
             --os_version 8.1.0 \
             --os_patch_level 2020-06 \
-            -o ../output/new-stock-test.img
+            -o ../output/new-twrp.img
 
       - name: Upload repacked TWRP image
         uses: actions/upload-artifact@v4
