@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: sudo apt-get install -y python3 cpio
+        run: sudo apt-get update && sudo apt-get install -y python3 cpio gzip
 
       - name: Create output directory
         run: mkdir -p extracted_twrp
@@ -22,9 +22,10 @@ jobs:
             -i input/twrp-3.5.2_9-0-ali.img \
             -o extracted_twrp
 
+      - name: List files in extracted_twrp (debug)
+        run: ls -l extracted_twrp
+
       - name: Extract ramdisk contents
         run: |
           mkdir -p extracted_twrp/ramdisk
-          cd extracted_twrp/ramdisk
-          gzip -dc ../ramdisk.cpio.gz | cpio -idmv
-
+          gzip -dc extracted_twrp/boot.img-ramdisk.gz | (cd extracted_twrp/ramdisk && cpio -idmv)
