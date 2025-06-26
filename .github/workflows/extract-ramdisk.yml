@@ -18,7 +18,7 @@ jobs:
       run: |
         mkdir -p output
         cd output
-        abootimg -x ../input/twrp-3.5.2_9-0-evert.img
+        abootimg -x ../input/twrp-3.5.2_9-0-ali.img
         cd ..
 
     - name: Unpack ramdisk
