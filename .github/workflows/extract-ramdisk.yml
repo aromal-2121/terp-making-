@@ -1,13 +1,16 @@
-name: Extract TWRP Ramdisk
+# .github/workflows/test-manual.yml
+name: Test Manual Workflow
 
 on:
   workflow_dispatch:
 
 jobs:
-  extract:
+  test:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Hello
+        run: echo "Manual workflow is working"
+
       - name: Checkout this repository
         uses: actions/checkout@v4
 
