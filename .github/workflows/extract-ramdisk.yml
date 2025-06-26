@@ -4,27 +4,42 @@ on:
   workflow_dispatch:
 
 jobs:
-  unpack:
+  extract:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y python3 cpio gzip file
-
-      - name: Create output directory
-        run: mkdir -p extracted_twrp
-
-      - name: Unpack TWRP image
         run: |
-          python3 tools/unpack_bootimg.py \
-            -i input/twrp-3.5.2_9-0-ali.img \
-            -o extracted_twrp || true
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full lz4 cpio unzip file
 
-      - name: 🔍 Debug: Show files and types
+      - name: Clone AIK
         run: |
-          echo "--- Files inside extracted_twrp ---"
-          find extracted_twrp -type f
-          echo "--- File types ---"
-          find extracted_twrp -type f -exec file {} \;
+          git clone https://github.com/osm0sis/Android-Image-Kitchen.git AIK
+          chmod +x AIK/unpackimg.sh AIK/repackimg.sh
+
+      - name: Prepare input image
+        run: mkdir -p input && cp input/twrp-3.5.2_9-0-ali.img ./AIK/image.img
+
+      - name: Unpack TWRP with AIK
+        run: |
+          cd AIK
+          ./unpackimg.sh image.img
+
+      - name: List unpacked files
+        run: |
+          echo "--- split_img/ ---"
+          ls -lh AIK/split_img
+          echo "--- ramdisk/ ---"
+          ls -lh AIK/ramdisk
+          echo "--- ramdisk file types ---"
+          file AIK/ramdisk/* || true
+
+      - name: Upload extracted ramdisk (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp-ramdisk
+          path: AIK/ramdisk
