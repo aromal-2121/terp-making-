@@ -1,8 +1,7 @@
-# .github/workflows/test-manual.yml
-name: Test Manual Workflow
+name: Test Manual Workflow # Uncommented this line
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # This enables the "Run workflow" button manually
 
 jobs:
   test:
@@ -26,6 +25,8 @@ jobs:
 
       - name: Copy TWRP image into AIK
         run: |
+          # Create the input directory if it doesn't exist. This assumes your 'input' directory
+          # with 'twrp-3.5.2_9-0-ali.img' is at the root of your repository.
           mkdir -p input
           cp input/twrp-3.5.2_9-0-ali.img AIK/image.img
 
