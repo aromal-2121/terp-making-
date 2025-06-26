@@ -21,7 +21,7 @@ jobs:
           cd repack
           python3 ../tools/mkbootimg.py \
             --kernel zImage \
-            --ramdisk stock_ramdisk.cpio.gz \
+            --ramdisk stock_ramdisk_fixed.cpio.gz \
             --base 0x80000000 \
             --pagesize 2048 \
             --kernel_offset 0x00008000 \
