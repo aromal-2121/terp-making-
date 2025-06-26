@@ -4,33 +4,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  extract:
+  unpack:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y abootimg cpio gzip
+      - name: Install dependencies
+        run: sudo apt-get install -y python3 cpio
 
-    - name: Extract TWRP image
-      run: |
-        mkdir -p output
-        cd output
-        abootimg -x ../input/twrp-3.5.2_9-0-ali.img
-        cd ..
+      - name: Create output directory
+        run: mkdir -p extracted_twrp
 
-    - name: Unpack ramdisk
-      run: |
-        mkdir ramdisk
-        cd ramdisk
-        gzip -dc ../output/initrd.img | cpio -i
-        cd ..
-        find ramdisk | cpio -o -H newc | gzip > output/twrp-ramdisk.img
+      - name: Unpack TWRP boot image
+        run: |
+          python3 tools/unpack_bootimg.py \
+            -i input/twrp-3.5.2_9-0-ali.img \
+            -o extracted_twrp
 
-    - name: Upload twrp-ramdisk.img
-      uses: actions/upload-artifact@v4
-      with:
-        name: twrp-ramdisk
-        path: output/twrp-ramdisk.img
+      - name: Extract ramdisk contents
+        run: |
+          mkdir -p extracted_twrp/ramdisk
+          cd extracted_twrp/ramdisk
+          gzip -dc ../ramdisk.cpio.gz | cpio -idmv
+
