@@ -1,9 +1,9 @@
-name: Extract Ramdisk from TWRP Image # Changed name to reflect original intent
+name: Extract Ramdisk from TWRP Image
 on:
-  workflow_dispatch: # This enables the "Run workflow" button manually
+  workflow_dispatch:
 
 jobs:
-  extract_ramdisk: # Changed job name for clarity
+  extract_ramdisk:
     runs-on: ubuntu-latest
     steps:
       - name: Hello World
@@ -15,24 +15,27 @@ jobs:
       - name: Install required tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full lz4 cpio unzip file
+          # Added 'perl' to ensure it's installed for AIK scripts
+          sudo apt-get install -y p7zip-full lz4 cpio unzip file perl
 
       - name: Clone Android Image Kitchen (AIK)
         run: |
           git clone https://github.com/osm0sis/Android-Image-Kitchen.git AIK
-          chmod +x AIK/*.sh
+          # Change .sh to .pl as AIK uses Perl scripts
+          chmod +x AIK/*.pl
 
       - name: Copy TWRP image into AIK
         run: |
-          # Create the 'input' directory if it doesn't exist, and copy the image.
-          # This assumes 'input/twrp-3.5.2_9-0-ali.img' is relative to your repo root.
           mkdir -p input
+          # Ensure your 'twrp-3.5.2_9-0-ali.img' is indeed in a directory named 'input'
+          # at the root of your repository.
           cp input/twrp-3.5.2_9-0-ali.img AIK/image.img
 
       - name: Unpack image using AIK
         run: |
           cd AIK
-          ./unpackimg.sh image.img
+          # Use 'perl' to execute the unpackimg.pl script
+          perl unpackimg.pl image.img
 
       - name: Show extracted files
         run: |
@@ -46,4 +49,4 @@ jobs:
         with:
           name: twrp-ramdisk-extracted
           path: AIK/ramdisk
-          retention-days: 5 # Optional: Set how long the artifact should be kept
+          retention-days: 5
