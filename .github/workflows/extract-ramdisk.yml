@@ -8,35 +8,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout this repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install required tools
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full lz4 cpio unzip file
 
-      - name: Clone AIK
+      - name: Clone Android Image Kitchen (AIK)
         run: |
           git clone https://github.com/osm0sis/Android-Image-Kitchen.git AIK
-          chmod +x AIK/unpackimg.sh AIK/repackimg.sh
+          chmod +x AIK/*.sh
 
-      - name: Prepare input image
-        run: mkdir -p input && cp input/twrp-3.5.2_9-0-ali.img ./AIK/image.img
+      - name: Copy TWRP image into AIK
+        run: |
+          mkdir -p input
+          cp input/twrp-3.5.2_9-0-ali.img AIK/image.img
 
-      - name: Unpack TWRP with AIK
+      - name: Unpack image using AIK
         run: |
           cd AIK
           ./unpackimg.sh image.img
 
-      - name: List unpacked files
+      - name: Show extracted files
         run: |
-          echo "--- split_img/ ---"
+          echo "--- Kernel and split info ---"
           ls -lh AIK/split_img
-          echo "--- ramdisk/ ---"
+          echo "--- Ramdisk contents ---"
           ls -lh AIK/ramdisk
-          echo "--- ramdisk file types ---"
-          file AIK/ramdisk/* || true
 
       - name: Upload extracted ramdisk (optional)
         uses: actions/upload-artifact@v4
